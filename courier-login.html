@@ -157,22 +157,22 @@
             <h1>Courier Login</h1>
             <p>Access your delivery dashboard</p>
         </div>
-        <form>
+        <form action="courier_login_handler.php" method="POST">
             <div class="form-group">
                 <label for="courier-id">Courier ID</label>
-                <input type="text" id="courier-id" required placeholder="Enter your courier ID">
+                <input type="text" id="courier-id" name="courier_id" required placeholder="Enter your courier ID">
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="Enter your email">
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
             <div class="remember-forgot">
                 <div class="remember-me">
-                    <input type="checkbox" id="remember">
+                    <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
                 <a href="#" class="forgot-password">Forgot Password?</a>
