@@ -78,23 +78,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Courier Profile - BookStore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Courier Profile - BookStore</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <style>
-        :root {
-            --primary-color: #9b59b6;
-            --primary-dark: #8e44ad;
-            --text-color: #2c3e50;
-            --background-color: #f4f6f8;
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: var(--background-color);
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #8e44ad;
+        }
+
+        .nav-links a.active {
+            background: #8e44ad;
         }
 
         .main-content {
@@ -114,34 +130,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             text-align: center;
-        }
-
-        .profile-image-container {
+        }        .profile-image-container {
             width: 200px;
             height: 200px;
             margin: 0 auto 1.5rem;
             position: relative;
         }
 
-        .profile-image {
+        .profile-avatar-large {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary-color);
-        }
-
-        .change-photo-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
+            font-weight: bold;
+            font-size: 4rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 4px solid var(--primary-color);
+        }
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -234,12 +243,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
+        }        .alert-error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .profile-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .profile-image-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .profile-avatar-large {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
@@ -248,12 +281,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
         <div class="sidebar-header">
             <i class="fas fa-truck"></i>
             <h2>Courier Dashboard</h2>
-        </div>
-        <ul class="nav-links">
+        </div>        <ul class="nav-links">
             <li><a href="courier-dashboard.php"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="active-deliveries.php"><i class="fas fa-box"></i> Active Deliveries</a></li>
             <li><a href="delivery-history.php"><i class="fas fa-history"></i> Delivery History</a></li>
-            <li><a href="route-planning.php"><i class="fas fa-route"></i> Route Planning</a></li>
+            <li><a href="delivery-status-management.php"><i class="fas fa-edit"></i> Status & Cancel Management</a></li>
+            <li><a href="customer-feedback.php"><i class="fas fa-star"></i> Customer Feedback</a></li>
+            <li><a href="advanced-search.php"><i class="fas fa-search"></i> Advanced Search</a></li>
             <li><a href="courier-profile.php" class="active"><i class="fas fa-user"></i> Profile</a></li>
             <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
             <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -279,18 +313,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
         <?php endif; ?>
 
         <div class="profile-container">
-            <div class="profile-card">
-                <div class="profile-image-container">
-                    <img src="<?php echo isset($courier['profile_image']) ? 'uploads/profile_images/' . $courier['profile_image'] : 'https://via.placeholder.com/200?text=Profile+Image'; ?>" 
-                         alt="Profile Image" class="profile-image" id="profileImage">
-                    <button type="button" class="change-photo-btn" onclick="document.getElementById('profileImageInput').click()">
-                        <i class="fas fa-camera"></i> Change Photo
-                    </button>
+            <div class="profile-card">                <div class="profile-image-container">
+                    <div class="profile-avatar-large">
+                        <?php 
+                        $name_parts = explode(' ', $courier['name']);
+                        $initials = '';
+                        foreach ($name_parts as $part) {
+                            $initials .= strtoupper(substr($part, 0, 1));
+                        }
+                        echo substr($initials, 0, 2); // Show first 2 initials
+                        ?>
+                    </div>
                 </div>
 
-                <form action="" method="POST" enctype="multipart/form-data" id="imageForm" style="display: none;">
-                    <input type="file" name="profile_image" id="profileImageInput" accept="image/*">
-                </form>
+                <h2><?php echo htmlspecialchars($courier['name']); ?></h2>
+                <p style="color: #666; margin-bottom: 1rem;">Courier ID: <?php echo htmlspecialchars($courier['courier_id']); ?></p><!-- Future enhancement: Profile customization form can be added here -->
 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -341,20 +378,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_profile'])) {
                 </form>
             </div>
         </div>
-    </div>
-
-    <script>
-        // Handle profile image upload
-        document.getElementById('profileImageInput').addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImage').src = e.target.result;
-                }
-                reader.readAsDataURL(e.target.files[0]);
-                document.getElementById('imageForm').submit();
-            }
-        });
+    </div>    <script>
+        // Profile page functionality
+        console.log('Profile page loaded successfully');
     </script>
 </body>
 </html>

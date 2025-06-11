@@ -10,49 +10,6 @@ if (!isset($_SESSION['courier_id'])) {
 
 $courier_id = $_SESSION['courier_id'];
 
-// Handle password change
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['change_password'])) {
-    try {
-        $current_password = $_POST['current_password'];
-        $new_password = $_POST['new_password'];
-        $confirm_password = $_POST['confirm_password'];
-
-        // Verify current password
-        $stmt = $conn->prepare("SELECT password FROM couriers WHERE courier_id = ?");
-        $stmt->bind_param("s", $courier_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $courier = $result->fetch_assoc();
-
-        if (!password_verify($current_password, $courier['password'])) {
-            throw new Exception("Current password is incorrect");
-        }
-
-        if ($new_password !== $confirm_password) {
-            throw new Exception("New passwords do not match");
-        }
-
-        if (strlen($new_password) < 8) {
-            throw new Exception("Password must be at least 8 characters long");
-        }
-
-        // Update password
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        $update_stmt = $conn->prepare("UPDATE couriers SET password = ? WHERE courier_id = ?");
-        $update_stmt->bind_param("ss", $hashed_password, $courier_id);
-        
-        if ($update_stmt->execute()) {
-            $_SESSION['success_message'] = "Password updated successfully!";
-            header("Location: settings.php");
-            exit();
-        } else {
-            throw new Exception("Failed to update password");
-        }
-    } catch (Exception $e) {
-        $error_message = $e->getMessage();
-    }
-}
-
 // Handle notification settings
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_notifications'])) {
     try {
@@ -74,11 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_notifications']
             exit();
         } else {
             throw new Exception("Failed to update notification settings");
-        }
-    } catch (Exception $e) {
+        }    } catch (Exception $e) {
         $error_message = $e->getMessage();
     }
 }
+
+// Get courier information with preferences
+$courier_stmt = $conn->prepare("SELECT * FROM couriers WHERE courier_id = ?");
+$courier_stmt->bind_param("s", $courier_id);
+$courier_stmt->execute();
+$courier_info = $courier_stmt->get_result()->fetch_assoc();
 
 // Get or create notification settings
 try {
@@ -106,41 +68,68 @@ try {
         'sms_notifications' => 1,
         'push_notifications' => 1
     ];
-    $error_message = "Could not load settings. Using defaults.";
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - BookStore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Settings - BookStore</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <style>
-        :root {
-            --primary-color: #9b59b6;
-            --primary-dark: #8e44ad;
-            --text-color: #2c3e50;
-            --background-color: #f4f6f8;
+
+        .nav-links {
+            list-style: none;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: var(--background-color);
+        .nav-links li {
+            margin-bottom: 1rem;
         }
 
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #8e44ad;
+        }        .nav-links a.active {
+            background: #8e44ad;
+        }
+
+        /* Main Content Styles */
         .main-content {
             margin-left: 250px;
             padding: 2rem;
         }
 
-        .settings-container {
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            color: var(--text-color);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .settings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 2rem;
+            margin-bottom: 2rem;
         }
 
         .settings-card {
@@ -148,53 +137,68 @@ try {
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .settings-card h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-card h2 i {
+            color: var(--primary-color);
         }
 
         .form-group {
             margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
+        }        .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-color);
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+        .toggle-section {
+            margin-bottom: 2rem;
         }
 
-        .form-group input[type="password"]:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        .toggle-switch {
+        .toggle-item {
             display: flex;
             align-items: center;
-            margin-bottom: 1.5rem;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .toggle-switch label {
-            margin-left: 1rem;
+        .toggle-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-title {
             color: var(--text-color);
-            font-weight: normal;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .toggle-description {
+            color: #666;
+            font-size: 0.85rem;
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input {
+            width: 54px;
+            height: 28px;
+        }        .switch input {
             opacity: 0;
             width: 0;
             height: 0;
@@ -207,16 +211,16 @@ try {
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #ddd;
             transition: .4s;
-            border-radius: 24px;
+            border-radius: 28px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 16px;
-            width: 16px;
+            height: 20px;
+            width: 20px;
             left: 4px;
             bottom: 4px;
             background-color: white;
@@ -237,46 +241,91 @@ try {
             color: white;
             border: none;
             padding: 1rem 2rem;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            width: 100%;
             justify-content: center;
+            width: 100%;
+            margin-top: 1rem;
         }
 
         .btn-save:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
         }
 
         .alert {
             padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid;
         }
 
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left-color: #4caf50;
+        }        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left-color: #f44336;
         }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .info-item strong {
+            color: var(--text-color);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 1200px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         h2 {
             color: var(--text-color);
-            margin-top: 0;
-            margin-bottom: 1.5rem;
+            margin-top: 0;            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -285,20 +334,21 @@ try {
         <div class="sidebar-header">
             <i class="fas fa-truck"></i>
             <h2>Courier Dashboard</h2>
-        </div>
-        <ul class="nav-links">
+        </div>        <ul class="nav-links">
             <li><a href="courier-dashboard.php"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="active-deliveries.php"><i class="fas fa-box"></i> Active Deliveries</a></li>
             <li><a href="delivery-history.php"><i class="fas fa-history"></i> Delivery History</a></li>
-            <li><a href="route-planning.php"><i class="fas fa-route"></i> Route Planning</a></li>
+            <li><a href="delivery-status-management.php"><i class="fas fa-edit"></i> Status & Cancel Management</a></li>
+            <li><a href="customer-feedback.php"><i class="fas fa-star"></i> Customer Feedback</a></li>
+            <li><a href="advanced-search.php"><i class="fas fa-search"></i> Advanced Search</a></li>
             <li><a href="courier-profile.php"><i class="fas fa-user"></i> Profile</a></li>
             <li><a href="settings.php" class="active"><i class="fas fa-cog"></i> Settings</a></li>
             <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
-    </div>
-
-    <div class="main-content">
-        <h1><i class="fas fa-cog"></i> Settings</h1>
+    </div>    <div class="main-content">        <div class="page-header">
+            <h1><i class="fas fa-cog"></i> Settings</h1>
+            <p>Manage your notifications and account information</p>
+        </div>
 
         <?php if (isset($_SESSION['success_message'])): ?>
             <div class="alert alert-success">
@@ -313,88 +363,89 @@ try {
             <div class="alert alert-error">
                 <?php echo $error_message; ?>
             </div>
-        <?php endif; ?>
-
-        <div class="settings-container">
-            <div class="settings-card">
-                <h2><i class="fas fa-lock"></i> Change Password</h2>
-                <form action="" method="POST" id="passwordForm">
-                    <div class="form-group">
-                        <label for="current_password">Current Password</label>
-                        <input type="password" id="current_password" name="current_password" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="new_password">New Password</label>
-                        <input type="password" id="new_password" name="new_password" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirm_password">Confirm New Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" required>
-                    </div>
-
-                    <input type="hidden" name="change_password" value="1">
-                    <button type="submit" class="btn-save">
-                        <i class="fas fa-save"></i> Update Password
-                    </button>
-                </form>
-            </div>
-
+        <?php endif; ?>        <div class="settings-grid">
             <div class="settings-card">
                 <h2><i class="fas fa-bell"></i> Notification Settings</h2>
-                <form action="" method="POST">
-                    <div class="toggle-switch">
-                        <label class="switch">
-                            <input type="checkbox" name="email_notifications" 
-                                   <?php echo $settings['email_notifications'] ? 'checked' : ''; ?>>
-                            <span class="slider"></span>
-                        </label>
-                        <label>Email Notifications</label>
-                    </div>
+                <div class="toggle-section">
+                    <form action="" method="POST">                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-title">Email Notifications</div>
+                                <div class="toggle-description">Receive updates via email</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="email_notifications" 
+                                       <?php echo $settings['email_notifications'] ? 'checked' : ''; ?>>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
 
-                    <div class="toggle-switch">
-                        <label class="switch">
-                            <input type="checkbox" name="sms_notifications"
-                                   <?php echo $settings['sms_notifications'] ? 'checked' : ''; ?>>
-                            <span class="slider"></span>
-                        </label>
-                        <label>SMS Notifications</label>
-                    </div>
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-title">SMS Notifications</div>
+                                <div class="toggle-description">Get instant alerts via text</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="sms_notifications"
+                                       <?php echo $settings['sms_notifications'] ? 'checked' : ''; ?>>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
 
-                    <div class="toggle-switch">
-                        <label class="switch">
-                            <input type="checkbox" name="push_notifications"
-                                   <?php echo $settings['push_notifications'] ? 'checked' : ''; ?>>
-                            <span class="slider"></span>
-                        </label>
-                        <label>Push Notifications</label>
-                    </div>
+                        <div class="toggle-item">
+                            <div class="toggle-info">
+                                <div class="toggle-title">Push Notifications</div>
+                                <div class="toggle-description">Real-time notifications on device</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" name="push_notifications"
+                                       <?php echo $settings['push_notifications'] ? 'checked' : ''; ?>>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
 
-                    <input type="hidden" name="update_notifications" value="1">
-                    <button type="submit" class="btn-save">
-                        <i class="fas fa-save"></i> Update Notifications
-                    </button>
-                </form>
+                        <input type="hidden" name="update_notifications" value="1">
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save"></i> Update Notifications
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h2><i class="fas fa-info-circle"></i> Account Information</h2>                <div class="preference-card">
+                    <div class="preference-title">
+                        <i class="fas fa-user"></i> Account Details
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>Name:</strong> <?php echo htmlspecialchars($courier_info['name']); ?>
+                        </div>
+                        <div class="info-item">
+                            <strong>Email:</strong> <?php echo htmlspecialchars($courier_info['email']); ?>
+                        </div>
+                        <div class="info-item">
+                            <strong>Phone:</strong> <?php echo htmlspecialchars($courier_info['phone'] ?? 'Not set'); ?>
+                        </div>
+                        <div class="info-item">
+                            <strong>Rating:</strong> <?php echo number_format($courier_info['avg_rating'] ?? 0, 1); ?> ⭐
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                        <i class="fas fa-edit"></i> <a href="courier-profile.php" style="color: var(--primary-color);">Edit Profile</a> to update your information.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-
-    <script>
-        // Password form validation
-        document.getElementById('passwordForm').addEventListener('submit', function(e) {
-            const newPassword = document.getElementById('new_password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            
-            if (newPassword !== confirmPassword) {
-                e.preventDefault();
-                alert('New passwords do not match!');
-            }
-            
-            if (newPassword.length < 8) {
-                e.preventDefault();
-                alert('Password must be at least 8 characters long!');
-            }
+    </div>    <script>
+        // Show success message for settings updates
+        document.addEventListener('DOMContentLoaded', function() {
+            const successAlerts = document.querySelectorAll('.alert-success');
+            successAlerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
         });
     </script>
 </body>

@@ -139,11 +139,49 @@
             align-items: center;
             gap: 0.5rem;
             transition: background 0.3s ease;
-        }
-
-        .back-button:hover {
+        }        .back-button:hover {
             background: #2980b9;
         }
+
+        /* Error message styles */
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+            background: #ffebee;
+        }
+
+        .form-group input.success {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .strength-meter {
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .strength-weak { background: #e74c3c; }
+        .strength-medium { background: #f39c12; }
+        .strength-strong { background: #27ae60; }
     </style>
 </head>
 <body>
@@ -156,15 +194,16 @@
             <i class="fas fa-user"></i>
             <h1>Customer Login</h1>
             <p>Access your account</p>
-        </div>
-        <form action="customer_login_handler.php" method="POST" autocomplete="off">
+        </div>        <form action="customer_login_handler.php" method="POST" autocomplete="off" id="customerLoginForm">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
+                <div class="error-message" id="email-error"></div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <div class="error-message" id="password-error"></div>
             </div>
             <div class="remember-forgot">
                 <div class="remember-me">

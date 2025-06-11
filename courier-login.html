@@ -139,10 +139,38 @@
             align-items: center;
             gap: 0.5rem;
             transition: background 0.3s ease;
+        }        .back-button:hover {
+            background: #8e44ad;
         }
 
-        .back-button:hover {
-            background: #8e44ad;
+        /* Error message styles */
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+            background: #ffebee;
+        }
+
+        .form-group input.success {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+
+        .validation-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            position: relative;
         }
     </style>
 </head>
@@ -180,19 +208,21 @@
                 document.querySelector('.login-container').insertBefore(errorDiv, document.querySelector('form'));
             }
         </script>
-        
-        <form action="simple_courier_login.php" method="POST" autocomplete="off">
+          <form action="simple_courier_login.php" method="POST" autocomplete="off" id="courierLoginForm">
             <div class="form-group">
                 <label for="courier-id">Courier ID</label>
                 <input type="text" id="courier-id" name="courier_id" required placeholder="Enter your courier ID">
+                <div class="error-message" id="courier-id-error"></div>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
+                <div class="error-message" id="email-error"></div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <div class="error-message" id="password-error"></div>
             </div>
             <div class="remember-forgot">
                 <div class="remember-me">
@@ -207,5 +237,134 @@
             </div>
         </form>
     </div>
+
+    <script>
+        // Validation #1: Courier Login Form JavaScript Validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('courierLoginForm');
+            const courierIdInput = document.getElementById('courier-id');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Real-time validation
+            courierIdInput.addEventListener('input', validateCourierID);
+            emailInput.addEventListener('input', validateEmail);
+            passwordInput.addEventListener('input', validatePassword);
+            
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                }
+            });
+            
+            function validateCourierID() {
+                const value = courierIdInput.value.trim();
+                const errorElement = document.getElementById('courier-id-error');
+                
+                // Courier ID format: COR + 3 digits (COR001, COR002, etc.)
+                const courierIdRegex = /^COR\d{3}$/;
+                
+                if (!value) {
+                    showError(courierIdInput, errorElement, 'Courier ID is required');
+                    return false;
+                } else if (!courierIdRegex.test(value)) {
+                    showError(courierIdInput, errorElement, 'Courier ID must be in format COR001, COR002, etc.');
+                    return false;
+                } else {
+                    showSuccess(courierIdInput, errorElement);
+                    return true;
+                }
+            }
+            
+            function validateEmail() {
+                const value = emailInput.value.trim();
+                const errorElement = document.getElementById('email-error');
+                
+                // Professional email validation
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                
+                if (!value) {
+                    showError(emailInput, errorElement, 'Email is required');
+                    return false;
+                } else if (!emailRegex.test(value)) {
+                    showError(emailInput, errorElement, 'Please enter a valid email address');
+                    return false;
+                } else if (value.length > 100) {
+                    showError(emailInput, errorElement, 'Email address is too long');
+                    return false;
+                } else {
+                    showSuccess(emailInput, errorElement);
+                    return true;
+                }
+            }
+            
+            function validatePassword() {
+                const value = passwordInput.value;
+                const errorElement = document.getElementById('password-error');
+                
+                // Password security requirements
+                const hasUppercase = /[A-Z]/.test(value);
+                const hasLowercase = /[a-z]/.test(value);
+                const hasNumber = /\d/.test(value);
+                const minLength = value.length >= 8;
+                
+                if (!value) {
+                    showError(passwordInput, errorElement, 'Password is required');
+                    return false;
+                } else if (!minLength) {
+                    showError(passwordInput, errorElement, 'Password must be at least 8 characters long');
+                    return false;
+                } else if (!hasUppercase || !hasLowercase || !hasNumber) {
+                    showError(passwordInput, errorElement, 'Password must contain at least one uppercase, one lowercase, and one number');
+                    return false;
+                } else {
+                    showSuccess(passwordInput, errorElement);
+                    return true;
+                }
+            }
+            
+            function validateForm() {
+                const isCourierIDValid = validateCourierID();
+                const isEmailValid = validateEmail();
+                const isPasswordValid = validatePassword();
+                
+                return isCourierIDValid && isEmailValid && isPasswordValid;
+            }
+            
+            function showError(input, errorElement, message) {
+                input.classList.add('error');
+                input.classList.remove('success');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                
+                // Add validation icon
+                addValidationIcon(input, 'error');
+            }
+            
+            function showSuccess(input, errorElement) {
+                input.classList.add('success');
+                input.classList.remove('error');
+                errorElement.style.display = 'none';
+                
+                // Add validation icon
+                addValidationIcon(input, 'success');
+            }
+            
+            function addValidationIcon(input, type) {
+                // Remove existing icons
+                const existingIcon = input.parentNode.querySelector('.validation-icon');
+                if (existingIcon) {
+                    existingIcon.remove();
+                }
+                
+                // Add new icon
+                const icon = document.createElement('i');
+                icon.className = `fas ${type === 'success' ? 'fa-check' : 'fa-times'} validation-icon`;
+                icon.style.color = type === 'success' ? '#27ae60' : '#e74c3c';
+                input.parentNode.appendChild(icon);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -5,11 +5,10 @@ require_once 'db_connect.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    
-    // For now, we'll use hardcoded admin credentials
+      // For now, we'll use hardcoded admin credentials
     // In a real system, this would be stored in a database with proper hashing
     $admin_username = 'admin';
-    $admin_password = 'admin123';
+    $admin_password = 'Admin123'; // Updated to meet validation requirements
     
     if ($username === $admin_username && $password === $admin_password) {
         // Login successful

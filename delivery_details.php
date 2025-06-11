@@ -10,7 +10,11 @@ if (!isset($_SESSION['courier_id'])) {
 
 // Check if delivery ID is provided
 if (!isset($_GET['id'])) {
-    header('Location: active-deliveries.php');
+    header('Location: activ            <li><a href="courier-dashboard.php"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="active-deliveries.php"><i class="fas fa-box"></i> Active Deliveries</a></li>
+            <li><a href="delivery-history.php"><i class="fas fa-history"></i> Delivery History</a></li>
+            <li><a href="courier-profile.php"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>veries.php');
     exit();
 }
 

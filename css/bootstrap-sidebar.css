@@ -1,0 +1,344 @@
+/* Bootstrap Enhanced Sidebar Styles for Courier Management System */
+:root {
+    --bs-primary: #9b59b6;
+    --bs-primary-rgb: 155, 89, 182;
+    --primary-color: #9b59b6;
+    --primary-dark: #8e44ad;
+    --text-color: #2c3e50;
+    --background-color: #f4f6f8;
+    --border-color: #e1e5e9;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #3498db;
+}
+
+/* Override Bootstrap primary color */
+.btn-primary {
+    --bs-btn-bg: var(--primary-color);
+    --bs-btn-border-color: var(--primary-color);
+    --bs-btn-hover-bg: var(--primary-dark);
+    --bs-btn-hover-border-color: var(--primary-dark);
+    --bs-btn-active-bg: var(--primary-dark);
+    --bs-btn-active-border-color: var(--primary-dark);
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+/* Enhanced body styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Sidebar with Bootstrap integration */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 2rem;
+    color: white;
+    overflow-y: auto;
+    z-index: 1050; /* Bootstrap z-index for fixed sidebars */
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar-header i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: rgba(255,255,255,0.9);
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Navigation links with Bootstrap styling */
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links li {
+    margin-bottom: 0.5rem;
+}
+
+.nav-links a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.nav-links a i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.nav-links a:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transform: translateX(5px);
+    text-decoration: none;
+}
+
+.nav-links a.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Main content positioning for Bootstrap */
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    min-height: 100vh;
+    background-color: var(--background-color);
+}
+
+/* Enhanced Card Components */
+.card {
+    border: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+}
+
+/* Custom Bootstrap badge colors */
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+/* Enhanced form controls */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(155, 89, 182, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(155, 89, 182, 0.25);
+}
+
+/* Tab Navigation Styles (Bootstrap enhanced) */
+.nav-tabs .nav-link {
+    color: var(--text-color);
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    background-color: rgba(155, 89, 182, 0.1);
+}
+
+/* Enhanced table styling */
+.table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.table thead th {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(155, 89, 182, 0.05);
+}
+
+/* Enhanced modal styling */
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-bottom: none;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* Alert enhancements */
+.alert-success {
+    background-color: rgba(39, 174, 96, 0.1);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-warning {
+    background-color: rgba(243, 156, 18, 0.1);
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+
+.alert-danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+.alert-info {
+    background-color: rgba(52, 152, 219, 0.1);
+    border-color: var(--info-color);
+    color: var(--info-color);
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .sidebar-header {
+        margin-bottom: 1rem;
+    }
+
+    .sidebar-header i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-links a {
+        padding: 0.5rem 1rem;
+    }
+
+    .nav-links a:hover {
+        transform: none;
+    }
+}
+
+/* Custom utilities */
+.shadow-custom {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+.border-custom {
+    border: 1px solid var(--border-color) !important;
+}
+
+.bg-light-custom {
+    background-color: #f8f9fa !important;
+}
+
+/* Loading spinner */
+.spinner-custom {
+    color: var(--primary-color);
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: var(--primary-color);
+    border-color: var(--border-color);
+}
+
+.pagination .page-link:hover {
+    background-color: rgba(155, 89, 182, 0.1);
+    border-color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: var(--primary-color);
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background-color: var(--primary-color);
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: var(--primary-color);
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: var(--primary-color);
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: var(--primary-color);
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: var(--primary-color);
+}
