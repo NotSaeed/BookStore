@@ -24,6 +24,23 @@
             align-items: center;
         }
 
+        .back-arrow {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-arrow:hover {
+            color: #e74c3c;
+        }
+
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             padding: 2rem;
@@ -86,20 +103,18 @@
             font-size: 0.9rem;
         }
 
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .forgot-password {
+        .remember-forgot a {
             color: #e74c3c;
             text-decoration: none;
         }
 
-        .login-button {
+        .remember-forgot a:hover {
+            text-decoration: underline;
+        }
+
+        .login-btn {
             width: 100%;
-            padding: 1rem;
+            padding: 0.8rem;
             background: #e74c3c;
             color: white;
             border: none;
@@ -109,39 +124,65 @@
             transition: background 0.3s ease;
         }
 
-        .login-button:hover {
+        .login-btn:hover {
             background: #c0392b;
         }
 
-        .back-button {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            background: #e74c3c;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.3s ease;
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: #666;
         }
 
-        .back-button:hover {
-            background: #c0392b;
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+            z-index: 1;
         }
 
-        .security-notice {
+        .divider span {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .additional-links {
             text-align: center;
             margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: #666;
+        }
+
+        .additional-links a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .additional-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .back-arrow {
+                top: 1rem;
+                left: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="select-role.html" class="back-button">
+    <a href="select-role.html" class="back-arrow">
         <i class="fas fa-arrow-left"></i>
         Back
     </a>
@@ -149,34 +190,62 @@
         <div class="login-header">
             <i class="fas fa-user-shield"></i>
             <h1>Admin Login</h1>
-            <p>Secure admin access portal</p>
+            <p>Access administrative dashboard</p>
         </div>
-        <form>
+        
+        <!-- Error message display -->
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error) {
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #ffebee; color: #c62828; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center;';
+                let errorMessage = '';
+                switch(error) {
+                    case 'invalid_credentials':
+                        errorMessage = 'Invalid admin credentials';
+                        break;
+                    case 'invalid_password':
+                        errorMessage = 'Incorrect password';
+                        break;
+                    case 'access_denied':
+                        errorMessage = 'Access denied. Admin privileges required.';
+                        break;
+                    default:
+                        errorMessage = 'Login failed. Please try again.';
+                }
+                errorDiv.textContent = errorMessage;
+                document.querySelector('.login-container').insertBefore(errorDiv, document.querySelector('form'));
+            }
+        </script>
+        
+        <form action="admin_login_handler.php" method="POST" autocomplete="off">
             <div class="form-group">
-                <label for="admin-id">Admin ID</label>
-                <input type="text" id="admin-id" required placeholder="Enter your admin ID">
+                <label for="admin-username">Admin Username</label>
+                <input type="text" id="admin-username" name="username" required placeholder="Enter admin username">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
-            </div>
-            <div class="form-group">
-                <label for="security-key">Security Key</label>
-                <input type="password" id="security-key" required placeholder="Enter security key">
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
             <div class="remember-forgot">
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Remember this device</label>
-                </div>
-                <a href="#" class="forgot-password">Reset Access</a>
+                <label>
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+                <a href="#">Forgot password?</a>
             </div>
-            <button type="submit" class="login-button">Secure Login</button>
-            <div class="security-notice">
-                <i class="fas fa-shield-alt"></i>
-                This is a secure admin portal. Unauthorized access is prohibited.
-            </div>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </button>
         </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <div class="additional-links">
+            <a href="select-role.html">← Back to role selection</a>
+        </div>
     </div>
 </body>
 </html>

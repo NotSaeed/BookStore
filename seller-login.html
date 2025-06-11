@@ -147,7 +147,7 @@
     </style>
 </head>
 <body>
-    <a href="select-role.html" class="back-button">
+    <a href="index.html" class="back-button">
         <i class="fas fa-arrow-left"></i>
         Back
     </a>
@@ -157,29 +157,29 @@
             <h1>Seller Login</h1>
             <p>Access your seller dashboard</p>
         </div>
-        <form>
+        <form action="seller_login_handler.php" method="POST" autocomplete="off">
             <div class="form-group">
                 <label for="seller-id">Seller ID</label>
-                <input type="text" id="seller-id" required placeholder="Enter your seller ID">
+                <input type="text" id="seller-id" name="seller_id" required placeholder="Enter your seller ID">
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="Enter your email">
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
             <div class="remember-forgot">
                 <div class="remember-me">
-                    <input type="checkbox" id="remember">
+                    <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
                 <a href="#" class="forgot-password">Forgot Password?</a>
             </div>
             <button type="submit" class="login-button">Login</button>
             <div class="register-link">
-                New seller? <a href="#">Register your business</a>
+                New seller? <a href="#">Register your store</a>
             </div>
         </form>
     </div>

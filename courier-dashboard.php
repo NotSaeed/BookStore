@@ -1,3 +1,39 @@
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Check if courier is logged in
+if (!isset($_SESSION['courier_id']) || !isset($_SESSION['courier_email'])) {
+    header('Location: courier-login.html');
+    exit();
+}
+
+// Get courier information
+$courier_id = $_SESSION['courier_id'];
+$stmt = $conn->prepare("SELECT * FROM couriers WHERE courier_id = ?");
+$stmt->bind_param("s", $courier_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$courier = $result->fetch_assoc();
+
+// Get today's deliveries count
+$today = date('Y-m-d');
+$stmt = $conn->prepare("SELECT 
+    COUNT(*) as total_today,
+    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_today,
+    SUM(CASE WHEN status IN ('pending', 'in_progress') THEN 1 ELSE 0 END) as pending_today
+    FROM deliveries 
+    WHERE courier_id = ? AND DATE(created_at) = ?");
+$stmt->bind_param("ss", $courier_id, $today);
+$stmt->execute();
+$counts = $stmt->get_result()->fetch_assoc();
+
+// Get active deliveries
+$stmt = $conn->prepare("SELECT * FROM deliveries WHERE courier_id = ? AND status != 'completed' ORDER BY created_at DESC LIMIT 5");
+$stmt->bind_param("s", $courier_id);
+$stmt->execute();
+$active_deliveries = $stmt->get_result();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -220,23 +256,23 @@
             <h2>Courier Dashboard</h2>
         </div>
         <ul class="nav-links">
-            <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li><a href="#"><i class="fas fa-box"></i> Active Deliveries</a></li>
-            <li><a href="#"><i class="fas fa-history"></i> Delivery History</a></li>
-            <li><a href="#"><i class="fas fa-route"></i> Route Planning</a></li>
-            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-            <li><a href="courier-login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="courier-dashboard.php" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="active-deliveries.php"><i class="fas fa-box"></i> Active Deliveries</a></li>
+            <li><a href="delivery-history.php"><i class="fas fa-history"></i> Delivery History</a></li>
+            <li><a href="route-planning.php"><i class="fas fa-route"></i> Route Planning</a></li>
+            <li><a href="courier-profile.php"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="header">
-            <h1>Welcome back, John!</h1>
+            <h1>Welcome back, <?php echo htmlspecialchars($courier['name']); ?>!</h1>
             <div class="profile-section">
-                <span>Online</span>
-                <img src="https://via.placeholder.com/40" alt="Profile Picture">
+                <span><?php echo $active_deliveries->num_rows > 0 ? 'On Duty' : 'Available'; ?></span>
+                <img src="<?php echo htmlspecialchars($courier['profile_image'] ?? 'https://via.placeholder.com/40'); ?>" alt="Profile Picture">
             </div>
         </div>
 
@@ -244,49 +280,43 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Today's Deliveries</h3>
-                <div class="value">12</div>
+                <div class="value"><?php echo $counts['total_today'] ?? 0; ?></div>
             </div>
             <div class="stat-card">
                 <h3>Completed Today</h3>
-                <div class="value">8</div>
+                <div class="value"><?php echo $counts['completed_today'] ?? 0; ?></div>
             </div>
             <div class="stat-card">
                 <h3>Pending</h3>
-                <div class="value">4</div>
+                <div class="value"><?php echo $counts['pending_today'] ?? 0; ?></div>
             </div>
             <div class="stat-card">
                 <h3>Average Rating</h3>
-                <div class="value">4.8 <i class="fas fa-star" style="color: gold; font-size: 1.5rem;"></i></div>
+                <div class="value"><?php echo number_format($courier['avg_rating'] ?? 0, 1); ?> <i class="fas fa-star" style="color: gold; font-size: 1.5rem;"></i></div>
             </div>
         </div>
 
         <!-- Active Deliveries -->
         <div class="delivery-list">
             <h2>Active Deliveries</h2>
-            <div class="delivery-item">
-                <div class="delivery-info">
-                    <h3>Order #1234</h3>
-                    <p>123 Main St, City</p>
-                </div>
-                <span class="delivery-status status-in-transit">In Transit</span>
-                <button class="action-btn btn-primary">Update Status</button>
-            </div>
-            <div class="delivery-item">
-                <div class="delivery-info">
-                    <h3>Order #1235</h3>
-                    <p>456 Oak Ave, City</p>
-                </div>
-                <span class="delivery-status status-pending">Pending</span>
-                <button class="action-btn btn-primary">Start Delivery</button>
-            </div>
-            <div class="delivery-item">
-                <div class="delivery-info">
-                    <h3>Order #1236</h3>
-                    <p>789 Pine St, City</p>
-                </div>
-                <span class="delivery-status status-delivered">Delivered</span>
-                <button class="action-btn btn-primary">View Details</button>
-            </div>
+            <?php if ($active_deliveries->num_rows > 0): ?>
+                <?php while ($delivery = $active_deliveries->fetch_assoc()): ?>
+                    <div class="delivery-item">
+                        <div class="delivery-info">
+                            <h3>Order #<?php echo htmlspecialchars($delivery['id']); ?></h3>
+                            <p><?php echo htmlspecialchars($delivery['delivery_details']); ?></p>
+                        </div>
+                        <span class="delivery-status status-<?php echo $delivery['status'] == 'in_progress' ? 'in-transit' : 'pending'; ?>">
+                            <?php echo ucfirst(str_replace('_', ' ', $delivery['status'])); ?>
+                        </span>
+                        <a href="delivery_details.php?id=<?php echo $delivery['id']; ?>" class="action-btn btn-primary">
+                            <?php echo $delivery['status'] == 'pending' ? 'Start Delivery' : 'Update Status'; ?>
+                        </a>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p style="text-align: center; color: #666;">No active deliveries at the moment.</p>
+            <?php endif; ?>
         </div>
     </div>
 </body>
