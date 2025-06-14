@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {                // Prepare and bind - Updated to match actual database structure
                 $stmt = $conn->prepare("INSERT INTO seller_books (
                     title, author, description, price, cost_price, 
-                    cover_image, isbn, category, book_condition, publisher, 
+                    cover_image, isbn, category, condition, publisher, 
                     publication_year, pages, weight, dimensions, stock_quantity, 
                     tags, language, is_public, is_featured, seller_id
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
