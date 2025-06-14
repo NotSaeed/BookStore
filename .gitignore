@@ -1,0 +1,57 @@
+# BookStore .gitignore
+
+# Sensitive configuration files
+config.local.php
+.env
+.env.local
+
+# User uploaded files (optional - you might want to track some sample images)
+# seller/uploads/*
+# !seller/uploads/.gitkeep
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+temp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PHP specific
+vendor/
+composer.lock
+
+# Database dumps (exclude auto-generated dumps)
+*.sql.backup
+database/backup/
+
+# Session files
+sessions/
+
+# Cache
+cache/
+*.cache
+
+# Node modules (if using npm/node for frontend tools)
+node_modules/
+package-lock.json
+
+# Build files
+dist/
+build/
