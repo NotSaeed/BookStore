@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/includes/seller_db.php';
 
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: login.php");
+    header("Location: seller_login.php");
     exit();
 }
 

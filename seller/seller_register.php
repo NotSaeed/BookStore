@@ -566,7 +566,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <a href="login.php" class="back-btn animate-on-scroll">
+    <a href="seller_login.php" class="back-btn animate-on-scroll">
         <i class="bi bi-arrow-left me-2"></i>Back to Login
     </a>
     
@@ -746,7 +746,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="login-link">
                         <p class="text-muted mb-0">
                             Already have an account? 
-                            <a href="login.php">Login here</a>
+                            <a href="seller_login.php">Login here</a>
                         </p>
                     </div>
                 </form>

@@ -449,7 +449,7 @@ if (isset($_GET['auto'])) {
 // IMPORTANT: Only proceed with logout if user was actually logged in
 if (!$seller_id) {
     // If no session exists, redirect to login
-    header("Location: login.php?msg=no_session");
+    header("Location: seller_login.php?msg=no_session");
     exit();
 }
 
@@ -533,11 +533,11 @@ if (isset($conn)) {
 
 // Handle AJAX logout requests
 if ($isAjax) {
-    sendJsonResponse(true, 'Logged out successfully', 'login.php');
+    sendJsonResponse(true, 'Logged out successfully', 'seller_login.php');
 }
 
 // Determine redirect URL based on logout type
-$redirect_url = 'login.php';
+$redirect_url = 'seller_login.php';
 $logout_message = '';
 
 switch ($logout_type) {
@@ -761,7 +761,7 @@ switch ($logout_type) {
                         <p class="small text-muted mb-2">Redirecting in:</p>
                         <div class="countdown-circle" id="countdownCircle">5</div>
                     </div>                    <div class="d-flex gap-2 justify-content-center mb-4">
-                        <a href="login.php" class="btn btn-primary" id="loginBtn">
+                        <a href="seller_login.php" class="btn btn-primary" id="loginBtn">
                             <i class="bi bi-box-arrow-in-right"></i> Login Again
                         </a>
                         <button type="button" class="btn btn-outline-primary" id="cancelBtn" onclick="handleCancel(this)">

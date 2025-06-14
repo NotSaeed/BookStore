@@ -5,7 +5,7 @@ require_once 'includes/seller_db.php';
 require_once 'includes/db_helpers.php';
 
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: login.php");
+    header("Location: seller_login.php");
     exit();
 }
 

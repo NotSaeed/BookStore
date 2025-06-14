@@ -2,7 +2,7 @@
 
 session_start();
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: login.php");
+    header("Location: seller_login.php");
     exit();
 }
 

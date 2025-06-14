@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/seller_db.php';
 
 // Security check
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: login.php");
+    header("Location: seller_login.php");
     exit();
 }
 
