@@ -102,7 +102,7 @@
     
     <?php
     $required_files = [
-        'seller_login.php' => 'Seller login page',
+        'login.php' => 'Seller login page',
         'seller_dashboard.php' => 'Seller dashboard',
         'seller_add_book.php' => 'Add book functionality',
         'seller_manage_books.php' => 'Book management',
@@ -189,7 +189,7 @@
     
     <a href="../index.html" class="btn btn-primary">Main Site</a>
     <a href="../select-role.html" class="btn btn-success">Select Role</a>
-    <a href="seller_login.php" class="btn btn-warning">Seller Login</a>
+    <a href="login.php" class="btn btn-warning">Seller Login</a>
     <a href="../database/install.php" class="btn btn-danger">Database Install</a>
     
     <h2>7. Test Credentials</h2>

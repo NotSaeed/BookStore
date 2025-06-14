@@ -56,7 +56,7 @@ try {
     echo "</ul>";
     
     echo "<h3>Next Steps:</h3>";
-    echo "<p>1. Access the seller login at: <a href='../seller/seller_login.php'>Seller Login</a></p>";
+    echo "<p>1. Access the seller login at: <a href='../seller/login.php'>Seller Login</a></p>";
     echo "<p>2. Test credentials: seller1@bookstore.com / password123</p>";
     echo "<p>3. Access the main site at: <a href='../index.html'>Main Site</a></p>";
     

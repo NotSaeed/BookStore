@@ -9,7 +9,7 @@ header('X-XSS-Protection: 1; mode=block');
 
 // Authentication check
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: seller_login.php");
+    header("Location: login.php");
     exit();
 }
 

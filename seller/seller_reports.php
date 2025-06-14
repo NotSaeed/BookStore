@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/includes/seller_db.php';
 
 if (!isset($_SESSION['seller_id'])) {
-    header("Location: seller_login.php");
+    header("Location: login.php");
     exit();
 }
 
