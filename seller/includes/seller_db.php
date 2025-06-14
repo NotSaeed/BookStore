@@ -7,7 +7,7 @@ date_default_timezone_set('Asia/Kuala_Lumpur');
 
 try {
     // Create connection with error handling
-    $conn = getMysqliConnection();
+    $conn = getDBConnection();
     
     // Set charset to utf8mb4 for full Unicode support
     $conn->set_charset("utf8mb4");
