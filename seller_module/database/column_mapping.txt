@@ -1,0 +1,13 @@
+-- Fix Column Name Inconsistencies
+-- This script updates all database column references in PHP files
+
+-- Column Mapping (Old -> New):
+-- book_title -> title
+-- book_author -> author
+-- book_price -> price
+-- book_stock -> stock_quantity
+-- book_category -> category
+-- book_description -> description
+-- book_isbn -> isbn
+-- book_cover -> cover_image
+-- book_genre -> genre
