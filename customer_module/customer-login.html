@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - BookStore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .forgot-password {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-button:hover {
+            background: #2980b9;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .register-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #2980b9;
+        }
+
+        /* Registration Modal Styles */
+        #register-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #register-modal > div {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: auto;
+            position: relative;
+        }
+
+        #close-register-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="select-role.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        Back
+    </a>
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-user"></i>
+            <h1>Customer Login</h1>
+            <p>Welcome back! Please login to your account</p>
+        </div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password">
+            </div>
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+            <button type="submit" class="login-button">Login</button>
+            <div id="login-error" style="color:red; margin-top:10px;"></div>
+            <div class="register-link">
+                Don't have an account? <a href="#" id="register-link">Register Now</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="register-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:2rem; border-radius:10px; max-width:400px; margin:auto; position:relative;">
+            <span id="close-register-modal" style="position:absolute; top:10px; right:15px; font-size:1.5rem; cursor:pointer;">&times;</span>
+            <h2 style="margin-bottom:1rem;">Register</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required placeholder="Enter your password">
+                </div>
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="reg-phone">Phone</label>
+                    <input type="tel" id="reg-phone" required placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="reg-address">Address</label>
+                    <input type="text" id="reg-address" required placeholder="Enter your address">
+                </div>
+                <button type="submit" class="login-button">Register</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('login-form').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            fetch('customer-login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "customer-dashboard.html";
+                } else {
+                    document.getElementById('login-error').textContent = "Invalid email or password.";
+                }
+            })
+            .catch(() => {
+                document.getElementById('login-error').textContent = "Login failed. Please try again.";
+            });
+        };
+
+        // Registration modal logic
+        document.getElementById('register-link').onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('register-modal').style.display = 'flex';
+        };
+        document.getElementById('close-register-modal').onclick = function() {
+            document.getElementById('register-modal').style.display = 'none';
+        };
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('register-modal')) {
+                document.getElementById('register-modal').style.display = 'none';
+            }
+        };
+
+        document.getElementById('register-form').onsubmit = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const address = document.getElementById('reg-address').value.trim();
+
+            fetch('customer-register.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&address=${encodeURIComponent(address)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Registration successful! You can now log in.");
+                    document.getElementById('register-modal').style.display = 'none';
+                } else {
+                    alert(data.error || "Registration failed.");
+                }
+            })
+            .catch(() => {
+                alert("Registration failed. Please try again.");
+            });
+        };
+    </script>
+</body>
+</html>
